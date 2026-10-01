@@ -1181,5 +1181,66 @@
             });
         });
     </script>
+<!-- FIREBASE REALTIME DATABASE SYNC -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBp57WGOhmhcCTfQA_kOb3Nh_XZS-9sIww",
+    authDomain: "registrasi-5d8e1.firebaseapp.com",
+    databaseURL: "https://registrasi-5d8e1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "registrasi-5d8e1",
+    storageBucket: "registrasi-5d8e1.firebasestorage.app",
+    messagingSenderId: "3774493819",
+    appId: "1:3774493819:web:56ded4fef4637095f71ede",
+    measurementId: "G-LDB9SDJWB8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 1. Hook ke tombol Simpan Admin
+  const btnSave = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Simpan Perubahan'));
+  if (btnSave) {
+    btnSave.addEventListener('click', () => {
+      setTimeout(() => {
+        // Ambil data sessionStates yang sudah dibuat sistem web kamu di localStorage
+        const stored = localStorage.getItem('sessionStates') || localStorage.getItem('scrimSessions');
+        if (stored) {
+          set(ref(db, 'scrim_settings/sessionStates'), JSON.parse(stored));
+        } else {
+          // Fallback membaca langsung semua checkbox admin
+          const states = {};
+          document.querySelectorAll('[data-sesi], .admin-item, tr, div').forEach(el => {
+            const txt = el.innerText;
+            const fullChk = el.querySelector('input[type="checkbox"][name*="full"], input[type="checkbox"]:nth-of-type(2)');
+            const hideChk = el.querySelector('input[type="checkbox"][name*="sembunyi"], input[type="checkbox"]:nth-of-type(1)');
+            if (txt && (fullChk || hideChk)) {
+              states[txt.slice(0, 20).trim()] = {
+                full: fullChk ? fullChk.checked : false,
+                hidden: hideChk ? hideChk.checked : false
+              };
+            }
+          });
+          set(ref(db, 'scrim_settings/sessionStates'), states);
+        }
+      }, 300);
+    });
+  }
+
+  // 2. Listener Realtime untuk semua HP
+  const dbRef = ref(db, 'scrim_settings/sessionStates');
+  onValue(dbRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+      localStorage.setItem('sessionStates', JSON.stringify(val));
+      localStorage.setItem('scrimSessions', JSON.stringify(val));
+      if (typeof applySessionStates === 'function') {
+        applySessionStates();
+      }
+    }
+  });
+</script>
 </body>
 </html>
