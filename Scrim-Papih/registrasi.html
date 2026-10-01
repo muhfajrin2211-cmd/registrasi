@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Scrim Papih Gaming</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a14;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3e;
+            --bg-card-hover: #222255;
+            --accent: #ff4444;
+            --accent-glow: #ff6b35;
+            --accent-blue: #4d7cff;
+            --gold: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0d0;
+            --text-muted: #8888aa;
+            --border-color: #2a2a5a;
+            --success: #4caf50;
+            --error: #ff5252;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(255, 68, 68, 0.3);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(255, 68, 68, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(77, 124, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 70%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { width: 100%; max-width: 720px; margin: 0 auto; position: relative; }
+
+        /* STEP INDICATOR */
+        .step-indicator { display: flex; justify-content: center; align-items: center; gap: 0; margin-bottom: 30px; position: relative; }
+        .step-dot {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--bg-card); border: 3px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.1rem; color: var(--text-muted);
+            transition: all var(--transition); position: relative; z-index: 2;
+            font-family: 'Courier New', monospace;
+        }
+        .step-dot.active {
+            background: var(--accent); border-color: var(--accent); color: #fff;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.5); animation: pulse-glow 2s infinite;
+        }
+        .step-dot.completed { background: var(--success); border-color: var(--success); color: #fff; }
+        .step-line { flex: 1; max-width: 120px; height: 4px; background: var(--border-color); border-radius: 2px; transition: all var(--transition); }
+        .step-line.completed { background: var(--success); }
+        .step-label {
+            position: absolute; bottom: -28px; font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); white-space: nowrap; font-weight: 600;
+        }
+        .step-label.active { color: var(--accent); }
+        .step-label.completed { color: var(--success); }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 68, 68, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(255, 68, 68, 0.8); }
+        }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 32px 28px;
+            box-shadow: var(--shadow); backdrop-filter: blur(10px); transition: all var(--transition);
+        }
+        .card:hover { border-color: rgba(255, 68, 68, 0.3); box-shadow: var(--shadow-glow); }
+
+        .header { text-align: center; margin-bottom: 28px; }
+        .header .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: #fff; padding: 6px 20px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 12px;
+            box-shadow: 0 4px 20px rgba(255, 68, 68, 0.4);
+        }
+        .header h1 {
+            font-size: 1.8rem; font-weight: 900; letter-spacing: 1px;
+            background: linear-gradient(135deg, #ffffff 0%, #ffd700 50%, #ff4444 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1.2; text-transform: uppercase;
+        }
+        .header .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px; }
+
+        .session-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+        .session-card {
+            background: var(--bg-secondary); border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 16px; text-align: center;
+            position: relative; overflow: hidden; user-select: none;
+        }
+        .session-card .session-type {
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 700; padding: 3px 10px; border-radius: 50px;
+            display: inline-block; margin-bottom: 6px;
+        }
+        .session-card .session-type.daily { background: rgba(77, 124, 255, 0.2); color: #7da3ff; }
+        .session-card .session-type.night { background: rgba(255, 215, 0, 0.2); color: var(--gold); }
+        .session-card .session-price { font-size: 1.15rem; font-weight: 800; color: #fff; }
+        .session-card .session-price span { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+
+        .session-times { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+        .session-time-item {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg-secondary); border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 12px 14px;
+            cursor: pointer; transition: all var(--transition); user-select: none;
+        }
+        .session-time-item:hover { border-color: rgba(255, 255, 255, 0.25); }
+        .session-time-item.selected {
+            border-color: var(--accent); background: rgba(255, 68, 68, 0.08);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.15);
+        }
+        .session-time-item .time-badge {
+            font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;
+            min-width: 55px; color: #fff;
+        }
+        .session-time-item .tag {
+            font-size: 0.6rem; text-transform: uppercase; font-weight: 700;
+            letter-spacing: 0.5px; padding: 2px 8px; border-radius: 50px; white-space: nowrap;
+        }
+        .session-time-item .tag.daily { background: rgba(77, 124, 255, 0.2); color: #7da3ff; }
+        .session-time-item .tag.night { background: rgba(255, 215, 0, 0.2); color: var(--gold); }
+        .session-time-item .price-tag { margin-left: auto; font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; }
+        .session-time-item .check-icon {
+            width: 20px; height: 20px; border: 2px solid var(--text-muted);
+            border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; transition: all var(--transition); flex-shrink: 0;
+        }
+        .session-time-item.selected .check-icon { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        /* Sesi FULL */
+        .session-time-item.full {
+            opacity: 0.55; cursor: not-allowed;
+            border-color: rgba(255, 82, 82, 0.5);
+            background: rgba(255, 82, 82, 0.05);
+        }
+        .session-time-item.full:hover { border-color: rgba(255, 82, 82, 0.5); }
+        .session-time-item.full .price-tag { font-size: 0; color: var(--error); }
+        .session-time-item.full .price-tag::before {
+            content: 'FULL'; font-size: 0.85rem; font-weight: 800; letter-spacing: 1px;
+        }
+        .session-time-item.full .check-icon { opacity: 0.3; border-color: var(--error); }
+
+        .info-note {
+            background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.85rem;
+            color: var(--gold); display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+        }
+        .info-note .icon { font-size: 1.2rem; flex-shrink: 0; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; font-size: 0.8rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-secondary); margin-bottom: 6px;
+        }
+        .form-group label .required { color: var(--accent); }
+        .form-input {
+            width: 100%; padding: 12px 16px; background: var(--bg-secondary);
+            border: 2px solid var(--border-color); border-radius: var(--radius-sm);
+            color: var(--text-primary); font-size: 0.95rem;
+            transition: all var(--transition); outline: none; font-family: inherit;
+        }
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.2);
+            background: rgba(255, 68, 68, 0.03);
+        }
+        .form-input::placeholder { color: var(--text-muted); font-size: 0.85rem; }
+        .form-input.error { border-color: var(--error); box-shadow: 0 0 20px rgba(255, 82, 82, 0.2); }
+        .error-message { font-size: 0.75rem; color: var(--error); margin-top: 4px; display: none; }
+        .error-message.show { display: block; animation: fadeIn 0.3s ease; }
+
+        .total-display {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 215, 0, 0.05));
+            border: 2px solid rgba(255, 68, 68, 0.3); border-radius: var(--radius-sm);
+            padding: 16px 20px; display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 20px;
+        }
+        .total-display .label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+        .total-display .amount { font-size: 1.5rem; font-weight: 900; color: var(--gold); letter-spacing: 0.5px; }
+        .total-display .amount small { font-size: 0.8rem; color: var(--text-muted); }
+
+        .btn {
+            width: 100%; padding: 16px 24px; border: none; border-radius: var(--radius-sm);
+            font-size: 1rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1.5px; cursor: pointer; transition: all var(--transition);
+            position: relative; overflow: hidden; font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: #fff; box-shadow: 0 8px 30px rgba(255, 68, 68, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 68, 68, 0.6);
+            background: linear-gradient(135deg, #ff5555, #ff7b45);
+        }
+        .btn-primary:disabled {
+            background: var(--border-color); color: var(--text-muted);
+            cursor: not-allowed; box-shadow: none; transform: none;
+        }
+        .btn-green {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: #fff; box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+        }
+        .btn-green:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(37, 211, 102, 0.6); }
+        .btn-secondary {
+            background: var(--bg-secondary); color: var(--text-primary);
+            border: 2px solid var(--border-color); box-shadow: none;
+        }
+        .btn-secondary:hover { border-color: var(--text-muted); transform: translateY(-2px); }
+
+        .qris-container { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+        .qris-frame {
+            background: #fff; padding: 20px; border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            max-width: 280px; width: 100%; text-align: center; margin-bottom: 12px;
+        }
+        .qris-frame img { width: 100%; height: auto; border-radius: 6px; display: block; }
+        .qris-caption { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+
+        .payment-amount-display {
+            text-align: center; margin: 16px 0; padding: 20px;
+            background: var(--bg-secondary); border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+        }
+        .payment-amount-display .label {
+            font-size: 0.8rem; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .payment-amount-display .amount {
+            font-size: 2.2rem; font-weight: 900; color: var(--gold);
+            letter-spacing: 1px; margin: 4px 0;
+        }
+
+        .transaction-id {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: rgba(255, 215, 0, 0.08); border: 1px dashed rgba(255, 215, 0, 0.5);
+            border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;
+            font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: 700;
+            color: var(--gold); letter-spacing: 2px;
+        }
+        .transaction-id .copy-btn {
+            background: none; border: 1px solid rgba(255, 215, 0, 0.4);
+            color: var(--gold); padding: 4px 10px; border-radius: 4px;
+            cursor: pointer; font-size: 0.7rem; transition: all var(--transition);
+            font-family: inherit;
+        }
+        .transaction-id .copy-btn:hover { background: rgba(255, 215, 0, 0.15); }
+        .transaction-note {
+            text-align: center; font-size: 0.82rem; color: var(--gold);
+            margin-top: -8px; margin-bottom: 16px; opacity: 0.9;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border-color); border-radius: var(--radius-sm);
+            padding: 32px 20px; text-align: center; cursor: pointer;
+            transition: all var(--transition); margin-bottom: 16px; position: relative;
+        }
+        .upload-area:hover { border-color: var(--accent); background: rgba(255, 68, 68, 0.03); }
+        .upload-area.dragover {
+            border-color: var(--accent); background: rgba(255, 68, 68, 0.08);
+            box-shadow: inset 0 0 40px rgba(255, 68, 68, 0.05);
+        }
+        .upload-area.error {
+            border-color: var(--error) !important;
+            background: rgba(255, 82, 82, 0.08) !important;
+            box-shadow: 0 0 16px rgba(255, 82, 82, 0.3) !important;
+        }
+        .upload-area .upload-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .upload-area .upload-text { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
+        .upload-area .upload-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .upload-area input[type="file"] { display: none; }
+        .upload-preview { display: none; text-align: center; }
+        .upload-preview img {
+            max-width: 100%; max-height: 200px; border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color); margin-bottom: 8px;
+        }
+        .upload-preview .file-name { font-size: 0.8rem; color: var(--text-secondary); word-break: break-all; }
+        .upload-preview .remove-file {
+            background: var(--error); color: #fff; border: none;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer;
+            font-size: 0.75rem; margin-top: 8px; font-weight: 600; transition: all var(--transition);
+        }
+        .upload-preview .remove-file:hover { background: #ff3333; }
+
+        .success-box {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px;
+            text-align: left;
+        }
+        .success-row {
+            display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
+        }
+        .success-row:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .success-label { color: var(--text-secondary); font-size: 0.85rem; }
+        .success-val { font-weight: 600; font-size: 0.95rem; }
+
+        .step-content { display: none; animation: fadeIn 0.4s ease; }
+        .step-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .card { padding: 20px 16px; }
+            .header h1 { font-size: 1.3rem; }
+            .session-cards { grid-template-columns: 1fr; }
+            .session-times { grid-template-columns: 1fr; }
+            .step-dot { width: 38px; height: 38px; font-size: 0.85rem; }
+            .step-line { max-width: 50px; }
+            .step-label { font-size: 0.55rem; bottom: -22px; }
+            .payment-amount-display .amount { font-size: 1.6rem; }
+            .qris-frame { max-width: 220px; padding: 14px; }
+            .total-display { flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px 16px; }
+            .total-display .label { font-size: 0.8rem; }
+            .total-display .amount { font-size: 1.2rem !important; white-space: normal; word-break: break-word; line-height: 1.3; text-align: left; width: 100%; }
+        }
+        @media (max-width: 400px) {
+            .session-times { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.1rem; }
+            .total-display .amount { font-size: 1rem !important; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* ADMIN BUTTON */
+        #adminBtn {
+            position: fixed; bottom: 15px; right: 15px; width: 50px; height: 50px;
+            border-radius: 50%; background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #444; color: #fff; font-size: 22px; cursor: pointer;
+            z-index: 999; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; backdrop-filter: blur(4px);
+        }
+        #adminBtn:hover { background: rgba(255, 68, 68, 0.7); transform: scale(1.05); }
+
+        /* ADMIN LOGIN MODAL */
+        #adminLoginModal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);
+            z-index: 1100; justify-content: center; align-items: center; backdrop-filter: blur(8px);
+        }
+        #adminLoginModal .modal-content {
+            background: var(--bg-card); padding: 30px 28px; border-radius: var(--radius);
+            width: 90%; max-width: 400px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+        }
+        #adminLoginModal .modal-content h2 {
+            text-align: center; margin-bottom: 20px; font-size: 1.4rem;
+            background: linear-gradient(135deg, #fff, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        #adminLoginModal .modal-content input {
+            width: 100%; padding: 12px 16px; background: var(--bg-secondary);
+            border: 2px solid var(--border-color); border-radius: var(--radius-sm);
+            color: var(--text-primary); font-size: 0.95rem; outline: none;
+            margin-bottom: 16px; font-family: inherit;
+        }
+        #adminLoginModal .modal-content input:focus { border-color: var(--accent); }
+        #adminLoginModal .modal-content .btn-login {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+            color: #fff; border: none; border-radius: var(--radius-sm);
+            font-weight: 800; font-size: 1rem; cursor: pointer;
+            transition: all var(--transition); font-family: inherit; letter-spacing: 1px;
+        }
+        #adminLoginModal .modal-content .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 68, 68, 0.4);
+        }
+        #adminLoginModal .modal-content .login-error {
+            color: var(--error); font-size: 0.8rem; text-align: center;
+            margin-top: 8px; display: none;
+        }
+        #adminLoginModal .modal-content .login-error.show { display: block; }
+
+        /* ADMIN DASHBOARD */
+        #adminDashboard {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
+            z-index: 1050; overflow-y: auto; padding: 20px; backdrop-filter: blur(6px);
+        }
+        #adminDashboard .dashboard-container {
+            max-width: 900px; margin: 0 auto; background: var(--bg-card);
+            border-radius: var(--radius); border: 1px solid var(--border-color);
+            padding: 24px 28px; box-shadow: var(--shadow); min-height: 60vh;
+        }
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 16px;
+        }
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #fff, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .dashboard-header .close-dash {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 8px 18px;
+            border-radius: var(--radius-sm); cursor: pointer;
+            font-size: 0.85rem; transition: all var(--transition); font-family: inherit;
+        }
+        .dashboard-header .close-dash:hover { border-color: var(--accent); color: #fff; }
+
+        /* SESSION TOGGLES */
+        .session-toggle-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+        .session-toggle-item {
+            display: flex; align-items: center; gap: 14px;
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 12px 16px; flex-wrap: wrap;
+        }
+        .session-toggle-item .toggle-session-label {
+            flex: 1; font-size: 0.85rem; color: #fff; font-weight: 700; min-width: 140px;
+        }
+        .session-toggle-item .badge-time { color: var(--gold); font-family: 'Courier New', monospace; }
+        .session-toggle-item .toggle-check {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.8rem; color: var(--text-secondary);
+            cursor: pointer; user-select: none; font-weight: 600;
+        }
+        .session-toggle-item .toggle-check.chk-full-label { color: var(--error); }
+        .session-toggle-item input[type="checkbox"] {
+            width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;
+        }
+        .session-toggle-item input.chk-full { accent-color: var(--error); }
+
+        .dash-save-btn {
+            padding: 12px 32px; background: var(--success); color: #fff;
+            border: none; border-radius: var(--radius-sm); font-weight: 700;
+            cursor: pointer; font-size: 0.9rem; transition: all var(--transition);
+            font-family: inherit; margin-top: 12px;
+        }
+        .dash-save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4); }
+
+        @media (max-width: 700px) {
+            .session-toggle-list { grid-template-columns: 1fr; }
+            .dashboard-container { padding: 16px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="appContainer">
+        <div class="step-indicator" id="stepIndicator">
+            <div style="display:flex;align-items:center;gap:0;position:relative;">
+                <div class="step-dot active" id="stepDot1">1</div>
+                <span class="step-label active" style="position:static;margin:0 6px;font-size:0.65rem;">Registrasi</span>
+                <div class="step-line" id="stepLine1"></div>
+                <div class="step-dot" id="stepDot2">2</div>
+                <span class="step-label" style="position:static;margin:0 6px;font-size:0.65rem;" id="stepLabel2">Pembayaran</span>
+                <div class="step-line" id="stepLine2"></div>
+                <div class="step-dot" id="stepDot3">3</div>
+                <span class="step-label" style="position:static;margin:0 6px;font-size:0.65rem;" id="stepLabel3">Selesai</span>
+            </div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="step-content active" id="step1">
+            <div class="card">
+                <div class="header">
+                    <div class="badge">🔥 Daily Scrim Papih Gaming</div>
+                    <h1>Registrasi Scrim<br />Papih Gaming</h1>
+                    <p class="subtitle">Isi formulir di bawah untuk mendaftar</p>
+                </div>
+
+                <div class="session-cards">
+                    <div class="session-card" id="infoDaily">
+                        <div class="session-type daily">⚡ DAILY SCRIM</div>
+                        <div class="session-price">Rp 5.000 <span>/ sesi</span></div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Pool Prize: Rp 35.000<br />+ Challenge</div>
+                    </div>
+                    <div class="session-card" id="infoNight">
+                        <div class="session-type night">🌙 NIGHT SCRIM</div>
+                        <div class="session-price">Rp 10.000 <span>/ sesi</span></div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Pool Prize: Rp 100.000<br />+ Challenge</div>
+                    </div>
+                </div>
+
+                <div class="info-note">
+                    <span class="icon">📌</span>
+                    <span><strong>Boleh daftar lebih dari 1 sesi!</strong> Pilih semua sesi yang kamu inginkan.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Tim <span class="required">*</span></label>
+                    <input type="text" class="form-input" id="teamName" placeholder="Masukkan nama tim kamu..." autocomplete="off" />
+                    <div class="error-message" id="teamNameError">Nama tim wajib diisi!</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nick Kapten <span class="required">*</span></label>
+                    <input type="text" class="form-input" id="captainNick" placeholder="Masukkan nick kapten..." autocomplete="off" />
+                    <div class="error-message" id="captainNickError">Nick kapten wajib diisi!</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nomor WhatsApp <span class="required">*</span></label>
+                    <input type="tel" class="form-input" id="whatsappNumber" placeholder="Contoh: 081234567890" autocomplete="off" maxlength="16" />
+                    <div class="error-message" id="whatsappError">Nomor WA wajib diisi dengan format angka!</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Pilih Sesi <span class="required">*</span></label>
+                    <div class="session-times" id="sessionTimesContainer">
+                        <div class="session-time-item" data-time="10.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">10.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="11.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">11.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="12.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">12.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="13.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">13.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="14.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">14.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="15.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">15.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="16.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">16.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="17.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">17.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="19.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">19.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="19.00" data-type="night" data-price="10000">
+                            <span class="check-icon">✓</span><span class="time-badge">19.00</span>
+                            <span class="tag night">NIGHT SCRIM</span><span class="price-tag">10K</span>
+                        </div>
+                        <div class="session-time-item" data-time="20.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">20.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="20.00" data-type="night" data-price="10000">
+                            <span class="check-icon">✓</span><span class="time-badge">20.00</span>
+                            <span class="tag night">NIGHT SCRIM</span><span class="price-tag">10K</span>
+                        </div>
+                        <div class="session-time-item" data-time="21.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">21.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="21.00" data-type="night" data-price="10000">
+                            <span class="check-icon">✓</span><span class="time-badge">21.00</span>
+                            <span class="tag night">NIGHT SCRIM</span><span class="price-tag">10K</span>
+                        </div>
+                        <div class="session-time-item" data-time="22.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">22.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="22.00" data-type="night" data-price="10000">
+                            <span class="check-icon">✓</span><span class="time-badge">22.00</span>
+                            <span class="tag night">NIGHT SCRIM</span><span class="price-tag">10K</span>
+                        </div>
+                        <div class="session-time-item" data-time="23.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">23.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="00.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">00.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                        <div class="session-time-item" data-time="01.00" data-type="daily" data-price="5000">
+                            <span class="check-icon">✓</span><span class="time-badge">01.00</span>
+                            <span class="tag daily">DAILY SCRIM</span><span class="price-tag">5K</span>
+                        </div>
+                    </div>
+                    <div class="error-message" id="sessionError" style="margin-top:6px;">Minimal pilih 1 sesi!</div>
+                </div>
+
+                <div class="total-display">
+                    <span class="label">💰 Total Pembayaran</span>
+                    <span class="amount" id="totalAmountDisplay">Rp 0 <small></small></span>
+                </div>
+
+                <button class="btn btn-primary" id="btnRegister" onclick="goToPayment()">
+                    Daftar & Lanjut Bayar ➜
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step-content" id="step2">
+            <div class="card">
+                <div class="header">
+                    <div class="badge">💳 Pembayaran</div>
+                    <h1 style="font-size:1.4rem;">Scan QRIS & Upload Bukti</h1>
+                    <p class="subtitle">Selesaikan pembayaran untuk konfirmasi</p>
+                </div>
+
+                <div class="qris-container">
+                    <div class="qris-frame">
+                        <img src="" alt="QRIS Papih Gaming" id="qrisImage">
+                    </div>
+                    <div class="qris-caption">Scan QRIS di atas menggunakan aplikasi pembayaran</div>
+                </div>
+
+                <div class="payment-amount-display">
+                    <div class="label">Nominal yang harus dibayar</div>
+                    <div class="amount" id="paymentAmount">Rp 0</div>
+                </div>
+
+                <div class="transaction-id">
+                    <span id="transactionIdDisplay">SCRIM-0000</span>
+                    <button class="copy-btn" onclick="copyTransactionId()">📋 Copy</button>
+                </div>
+                <div class="transaction-note">📌 Salin kode scrim ini ke admin</div>
+
+                <div class="form-group">
+                    <label>Upload Bukti Transfer <span class="required">*</span></label>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Klik atau Drag & Drop file di sini</div>
+                        <div class="upload-hint">Format: JPG, PNG, JPEG | Maks 10 MB</div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" onchange="handleFileSelect(event)">
+                    <div class="upload-preview" id="uploadPreview">
+                        <img id="previewImage" src="" alt="Preview Bukti">
+                        <div class="file-name" id="fileName"></div>
+                        <button class="remove-file" onclick="removeFile()">✕ Hapus File</button>
+                    </div>
+                    <div class="error-message" id="uploadError">Upload bukti transfer wajib!</div>
+                </div>
+
+                <button class="btn btn-green" id="btnWaAdmin" onclick="goToWhatsApp()">
+                    Lanjut ke WA Admin 📱
+                </button>
+                <button class="btn btn-secondary" style="margin-top:10px;" onclick="goBackToStep1()">
+                    ← Kembali
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-content" id="step3">
+            <div class="card" style="text-align:center;">
+                <div class="header">
+                    <span style="font-size:3rem;display:block;margin-bottom:10px;">✅</span>
+                    <h1 style="font-size:1.5rem;">Pendaftaran Terkirim!</h1>
+                    <p class="subtitle">Data kamu sudah siap dikirim ke Admin</p>
+                </div>
+
+                <div class="success-box">
+                    <div class="success-row">
+                        <span class="success-label">Kode Scrim:</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span id="step3TransactionId" style="font-family:'Courier New',monospace;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:1px;">SCRIM-0000</span>
+                            <button class="copy-btn" onclick="copyTransactionId()">📋 Copy</button>
+                        </div>
+                    </div>
+                    <div class="success-row">
+                        <span class="success-label">Nomor WA Admin:</span>
+                        <span id="step3AdminWa" class="success-val" style="color:var(--text-primary);">+62 851-6623-5006</span>
+                    </div>
+                </div>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">
+                    Silakan klik tombol di bawah untuk konfirmasi via WhatsApp.
+                </p>
+                <button class="btn btn-green" onclick="openWhatsApp()">
+                    Buka WhatsApp Admin 📱
+                </button>
+                <button class="btn btn-secondary" style="margin-top:10px;" onclick="resetAll()">
+                    Registrasi Baru
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="adminLoginModal">
+        <div class="modal-content">
+            <h2>🔒 Admin Panel</h2>
+            <input type="password" id="adminPasswordInput" placeholder="Masukkan password admin" />
+            <button class="btn-login" onclick="adminLogin()">Masuk</button>
+            <div class="login-error" id="loginError">Password salah!</div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h2>⚙️ Dashboard Admin</h2>
+                <button class="close-dash" onclick="closeDashboard()">✕ Tutup</button>
+            </div>
+
+            <h3 style="color:var(--text-secondary);margin-bottom:8px;">Kelola Sesi</h3>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:16px;line-height:1.7;">
+                ✅ Centang <strong style="color:var(--accent);">Sembunyikan</strong> → sesi hilang dari form.<br>
+                🔴 Centang <strong style="color:var(--error);">Full</strong> → sesi tetap tampil tapi tidak bisa dipilih (ada tulisan FULL).
+            </p>
+
+            <div class="session-toggle-list" id="sessionToggleList"></div>
+            <button class="dash-save-btn" onclick="saveSessionStates()">💾 Simpan Perubahan</button>
+        </div>
+    </div>
+
+    <button id="adminBtn" title="Admin Panel" onclick="openAdminLogin()">⚙️</button>
+
+    <script>
+        // ==================== KONFIGURASI ====================
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtrKFN27b3KHR_hWnVrN7JiFxLSWGG5g-FGxp3GXUFajLFVvPwijkeEQ3YRImniN3Lsw/exec';
+        const ADMIN_PASSWORD = 'papihgaming123';
+        const WA_ADMIN_NUMBER = '6285166235006';
+
+        // ==================== PETA QRIS ====================
+        const QRIS_MAP = {
+            5000:   'qris-5000.png',
+            10000:  'qris-10000.png',
+            15000:  'qris-15000.png',
+            20000:  'qris-20000.png',
+            25000:  'qris-25000.png',
+            30000:  'qris-30000.png',
+            35000:  'qris-35000.png',
+            40000:  'qris-40000.png',
+            45000:  'qris-45000.png',
+            50000:  'qris-50000.png',
+        };
+        const QRIS_STATIS = 'qris-bebas.png';
+        const BATAS_QRIS_DINAMIS = 50000;
+
+        // ==================== STATE ====================
+        let state = {
+            teamName: '', captainNick: '', whatsappNumber: '',
+            selectedSessions: [], totalPrice: 0, transactionId: '',
+            uploadedFile: null, uploadedFileName: '', uploadedFileDataUrl: '',
+        };
+
+        // ==================== DOM REFS ====================
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const stepDot1 = document.getElementById('stepDot1');
+        const stepDot2 = document.getElementById('stepDot2');
+        const stepDot3 = document.getElementById('stepDot3');
+        const stepLine1 = document.getElementById('stepLine1');
+        const stepLine2 = document.getElementById('stepLine2');
+        const teamNameInput = document.getElementById('teamName');
+        const captainNickInput = document.getElementById('captainNick');
+        const whatsappInput = document.getElementById('whatsappNumber');
+        const sessionTimesContainer = document.getElementById('sessionTimesContainer');
+        const totalAmountDisplay = document.getElementById('totalAmountDisplay');
+        const paymentAmountDisplay = document.getElementById('paymentAmount');
+        const transactionIdDisplay = document.getElementById('transactionIdDisplay');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const previewImage = document.getElementById('previewImage');
+        const fileNameDisplay = document.getElementById('fileName');
+        const btnWaAdmin = document.getElementById('btnWaAdmin');
+
+        // ==================== REALTIME INPUT VALIDATION ====================
+        teamNameInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('error');
+                document.getElementById('teamNameError').classList.remove('show');
+            }
+        });
+
+        captainNickInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('error');
+                document.getElementById('captainNickError').classList.remove('show');
+            }
+        });
+
+        whatsappInput.addEventListener('input', function() {
+            const wa = this.value.trim();
+            if (/^[0-9]{8,16}$/.test(wa)) {
+                this.classList.remove('error');
+                document.getElementById('whatsappError').classList.remove('show');
+            }
+        });
+
+        // ==================== SESSION SELECTION ====================
+        sessionTimesContainer.querySelectorAll('.session-time-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.style.display === 'none') return;
+                if (this.classList.contains('full')) return;
+                const time = this.dataset.time;
+                const type = this.dataset.type;
+                const price = parseInt(this.dataset.price);
+                const idx = state.selectedSessions.findIndex(s => s.time === time && s.type === type);
+                if (idx >= 0) {
+                    state.selectedSessions.splice(idx, 1);
+                    this.classList.remove('selected');
+                } else {
+                    state.selectedSessions.push({ time, type, price });
+                    this.classList.add('selected');
+                }
+                if (state.selectedSessions.length > 0) {
+                    document.getElementById('sessionError').classList.remove('show');
+                }
+                updateTotalDisplay();
+            });
+        });
+
+        function updateTotalDisplay() {
+            const total = state.selectedSessions.reduce((sum, s) => sum + s.price, 0);
+            state.totalPrice = total;
+            totalAmountDisplay.innerHTML = `Rp ${total.toLocaleString('id-ID')} <small></small>`;
+            paymentAmountDisplay.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+
+            const qrisImg = document.getElementById('qrisImage');
+            const qrisCaption = document.querySelector('.qris-caption');
+
+            if (total === 0) {
+                qrisImg.src = '';
+                qrisImg.style.display = 'none';
+                if (qrisCaption) qrisCaption.textContent = 'Pilih sesi dulu untuk melihat QRIS';
+            } else if (total <= BATAS_QRIS_DINAMIS && QRIS_MAP[total]) {
+                qrisImg.src = QRIS_MAP[total];
+                qrisImg.style.display = 'block';
+                if (qrisCaption) qrisCaption.textContent = `Scan QRIS di atas — Rp ${total.toLocaleString('id-ID')}`;
+            } else {
+                qrisImg.src = QRIS_STATIS;
+                qrisImg.style.display = 'block';
+                if (qrisCaption) qrisCaption.innerHTML = `Scan QRIS di atas, lalu masukkan nominal:<br><strong style="color:var(--gold);font-size:1.1rem;">Rp ${total.toLocaleString('id-ID')}</strong>`;
+            }
+        }
+
+        // ==================== VALIDATION ====================
+        function validateStep1() {
+            let isValid = true;
+            if (!teamNameInput.value.trim()) {
+                teamNameInput.classList.add('error');
+                document.getElementById('teamNameError').classList.add('show');
+                isValid = false;
+            } else {
+                teamNameInput.classList.remove('error');
+                document.getElementById('teamNameError').classList.remove('show');
+            }
+            if (!captainNickInput.value.trim()) {
+                captainNickInput.classList.add('error');
+                document.getElementById('captainNickError').classList.add('show');
+                isValid = false;
+            } else {
+                captainNickInput.classList.remove('error');
+                document.getElementById('captainNickError').classList.remove('show');
+            }
+            const wa = whatsappInput.value.trim();
+            if (!wa || !/^[0-9]{8,16}$/.test(wa)) {
+                whatsappInput.classList.add('error');
+                document.getElementById('whatsappError').classList.add('show');
+                isValid = false;
+            } else {
+                whatsappInput.classList.remove('error');
+                document.getElementById('whatsappError').classList.remove('show');
+            }
+            if (state.selectedSessions.length === 0) {
+                document.getElementById('sessionError').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('sessionError').classList.remove('show');
+            }
+            return isValid;
+        }
+
+        // ==================== TRANSACTION ID ====================
+        function generateTransactionId() {
+            return `SCRIM-${Math.floor(1000 + Math.random() * 9000)}`;
+        }
+
+        // ==================== NAVIGATION ====================
+        function goToPayment() {
+            if (!validateStep1()) return;
+            state.teamName = teamNameInput.value.trim();
+            state.captainNick = captainNickInput.value.trim();
+            state.whatsappNumber = whatsappInput.value.trim();
+            state.transactionId = generateTransactionId();
+            transactionIdDisplay.textContent = state.transactionId;
+            const s3Id = document.getElementById('step3TransactionId');
+            if (s3Id) s3Id.textContent = state.transactionId;
+            updateTotalDisplay();
+            paymentAmountDisplay.textContent = `Rp ${state.totalPrice.toLocaleString('id-ID')}`;
+            showStep(2);
+            updateStepIndicator(2);
+        }
+        function goBackToStep1() { showStep(1); updateStepIndicator(1); }
+        function showStep(n) {
+            [step1, step2, step3].forEach(el => el.classList.remove('active'));
+            if (n === 1) step1.classList.add('active');
+            if (n === 2) step2.classList.add('active');
+            if (n === 3) step3.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function updateStepIndicator(step) {
+            [stepDot1, stepDot2, stepDot3].forEach(el => el.classList.remove('active', 'completed'));
+            [stepLine1, stepLine2].forEach(el => el.classList.remove('completed'));
+            if (step === 1) { stepDot1.classList.add('active'); }
+            else if (step === 2) {
+                stepDot1.classList.add('completed'); stepDot2.classList.add('active');
+                stepLine1.classList.add('completed');
+            } else if (step === 3) {
+                stepDot1.classList.add('completed'); stepDot2.classList.add('completed');
+                stepDot3.classList.add('completed');
+                stepLine1.classList.add('completed'); stepLine2.classList.add('completed');
+            }
+        }
+        function resetAll() {
+            state = { teamName: '', captainNick: '', whatsappNumber: '', selectedSessions: [],
+                      totalPrice: 0, transactionId: '', uploadedFile: null,
+                      uploadedFileName: '', uploadedFileDataUrl: '' };
+            teamNameInput.value = ''; captainNickInput.value = ''; whatsappInput.value = '';
+            ['teamNameError', 'captainNickError', 'whatsappError', 'sessionError', 'uploadError'].forEach(id => {
+                document.getElementById(id).classList.remove('show');
+            });
+            [teamNameInput, captainNickInput, whatsappInput].forEach(el => el.classList.remove('error'));
+            sessionTimesContainer.querySelectorAll('.session-time-item').forEach(el => el.classList.remove('selected'));
+            removeFile();
+            uploadArea.classList.remove('error');
+            updateTotalDisplay();
+            transactionIdDisplay.textContent = 'SCRIM-0000';
+            const s3Id = document.getElementById('step3TransactionId');
+            if (s3Id) s3Id.textContent = 'SCRIM-0000';
+            showStep(1); updateStepIndicator(1);
+        }
+
+        // ==================== UPLOAD ====================
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            processFile(file);
+        }
+        function processFile(file) {
+            if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+                alert('Format file tidak didukung! Gunakan JPG, PNG, atau JPEG.');
+                fileInput.value = ''; return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File terlalu besar! Maksimal 10 MB.');
+                fileInput.value = ''; return;
+            }
+            state.uploadedFile = file;
+            state.uploadedFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                state.uploadedFileDataUrl = ev.target.result;
+                previewImage.src = ev.target.result;
+                fileNameDisplay.textContent = file.name;
+                uploadPreview.style.display = 'block';
+                uploadArea.style.display = 'none';
+                uploadArea.classList.remove('error');
+                document.getElementById('uploadError').classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+        function removeFile() {
+            state.uploadedFile = null;
+            state.uploadedFileName = '';
+            state.uploadedFileDataUrl = '';
+            fileInput.value = '';
+            uploadPreview.style.display = 'none';
+            uploadArea.style.display = 'block';
+            previewImage.src = '';
+            fileNameDisplay.textContent = '';
+            uploadArea.classList.remove('error');
+        }
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); });
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault(); uploadArea.classList.remove('dragover');
+            const f = e.dataTransfer.files[0];
+            if (f) processFile(f);
+        });
+
+        // ==================== COPY ====================
+        function copyTransactionId() {
+            const text = state.transactionId || transactionIdDisplay.textContent;
+            navigator.clipboard.writeText(text).then(() => alert('Kode Scrim disalin!'))
+                .catch(() => {
+                    const inp = document.createElement('input');
+                    inp.value = text; document.body.appendChild(inp); inp.select();
+                    document.execCommand('copy'); document.body.removeChild(inp);
+                    alert('Kode Scrim disalin!');
+                });
+        }
+
+        // ==================== WHATSAPP (MESSAGE SINGKAT) ====================
+        function buildWhatsAppMessage() {
+            const sessions = state.selectedSessions.map(s =>
+                `- ${s.time} ${s.type === 'daily' ? 'DAILY SCRIM' : 'NIGHT SCRIM'}`
+            ).join('\n');
+            return `Kode Scrim: ${state.transactionId}\n` +
+                `Nama Tim: ${state.teamName}\n` +
+                `Nick Kapten: ${state.captainNick}\n` +
+                `No WhatsApp: ${state.whatsappNumber}\n` +
+                `Sesi yang dipilih:\n${sessions}\n\n` +
+                `Total Pembayaran: Rp ${state.totalPrice.toLocaleString('id-ID')}`;
+        }
+        function goToWhatsApp() {
+            if (!state.uploadedFile) {
+                uploadArea.classList.add('error');
+                document.getElementById('uploadError').classList.add('show');
+                alert('Silakan upload bukti transfer terlebih dahulu!');
+                return;
+            }
+            sendToSheet();
+            const s3Id = document.getElementById('step3TransactionId');
+            if (s3Id) s3Id.textContent = state.transactionId;
+            const s3Wa = document.getElementById('step3AdminWa');
+            if (s3Wa) {
+                s3Wa.textContent = WA_ADMIN_NUMBER.startsWith('62') ? ('+62 ' + WA_ADMIN_NUMBER.slice(2)) : WA_ADMIN_NUMBER;
+            }
+            showStep(3); updateStepIndicator(3);
+        }
+        function openWhatsApp() {
+            const msg = encodeURIComponent(buildWhatsAppMessage());
+            window.open(`https://wa.me/${WA_ADMIN_NUMBER}?text=${msg}`, '_blank');
+        }
+
+        // ==================== SEND TO SHEET ====================
+        function sendToSheet() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('AKfycbx...')) {
+                console.warn('GOOGLE_SCRIPT_URL belum diisi.');
+                return;
+            }
+            const payload = {
+                action: 'add',
+                transactionId: state.transactionId,
+                teamName: state.teamName,
+                captainNick: state.captainNick,
+                whatsappNumber: state.whatsappNumber,
+                sessions: state.selectedSessions.map(s => `${s.time} ${s.type === 'daily' ? 'DAILY SCRIM' : 'NIGHT SCRIM'}`).join(', '),
+                totalPrice: state.totalPrice,
+                bukti: state.uploadedFileDataUrl,
+                status: 'Menunggu konfirmasi'
+            };
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error('Gagal kirim:', err));
+        }
+
+        // ==================== ADMIN LOGIN ====================
+        function openAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'flex';
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('loginError').classList.remove('show');
+        }
+        function adminLogin() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if (pass === ADMIN_PASSWORD) {
+                document.getElementById('adminLoginModal').style.display = 'none';
+                openDashboard();
+            } else {
+                document.getElementById('loginError').classList.add('show');
+            }
+        }
+
+        // ==================== DASHBOARD ====================
+        function openDashboard() {
+            document.getElementById('adminDashboard').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            loadSessionToggles();
+        }
+        function closeDashboard() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // ==================== SESSION TOGGLES (Hide + Full) ====================
+        function loadSessionToggles() {
+            const container = document.getElementById('sessionToggleList');
+            const items = document.querySelectorAll('.session-time-item');
+            const hidden = JSON.parse(localStorage.getItem('hiddenSessions') || '[]');
+            const full = JSON.parse(localStorage.getItem('fullSessions') || '[]');
+            container.innerHTML = '';
+            items.forEach((el) => {
+                const time = el.dataset.time;
+                const type = el.dataset.type;
+                const typeLabel = type === 'daily' ? 'DAILY SCRIM' : 'NIGHT SCRIM';
+                const isHidden = hidden.some(h => h.time === time && h.type === type);
+                const isFull = full.some(f => f.time === time && f.type === type);
+                const div = document.createElement('div');
+                div.className = 'session-toggle-item';
+                div.innerHTML = `
+                    <span class="toggle-session-label"><span class="badge-time">${time}</span> ${typeLabel}</span>
+                    <label class="toggle-check"><input type="checkbox" class="chk-hide" ${isHidden ? 'checked' : ''} data-time="${time}" data-type="${type}"> Sembunyikan</label>
+                    <label class="toggle-check chk-full-label"><input type="checkbox" class="chk-full" ${isFull ? 'checked' : ''} data-time="${time}" data-type="${type}"> Full</label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveSessionStates() {
+            const hidden = [];
+            const full = [];
+            document.querySelectorAll('#sessionToggleList .chk-hide').forEach(cb => {
+                if (cb.checked) hidden.push({ time: cb.dataset.time, type: cb.dataset.type });
+            });
+            document.querySelectorAll('#sessionToggleList .chk-full').forEach(cb => {
+                if (cb.checked) full.push({ time: cb.dataset.time, type: cb.dataset.type });
+            });
+            localStorage.setItem('hiddenSessions', JSON.stringify(hidden));
+            localStorage.setItem('fullSessions', JSON.stringify(full));
+            applySessionStates();
+            alert('Perubahan tersimpan!');
+        }
+
+        function applySessionStates() {
+            const hidden = JSON.parse(localStorage.getItem('hiddenSessions') || '[]');
+            const full = JSON.parse(localStorage.getItem('fullSessions') || '[]');
+            document.querySelectorAll('.session-time-item').forEach(el => {
+                const time = el.dataset.time;
+                const type = el.dataset.type;
+                const isHidden = hidden.some(h => h.time === time && h.type === type);
+                const isFull = full.some(f => f.time === time && f.type === type);
+                if (isHidden) {
+                    el.style.display = 'none';
+                    el.classList.remove('selected', 'full');
+                    state.selectedSessions = state.selectedSessions.filter(s => !(s.time === time && s.type === type));
+                } else {
+                    el.style.display = 'flex';
+                    if (isFull) {
+                        el.classList.add('full');
+                        el.classList.remove('selected');
+                        state.selectedSessions = state.selectedSessions.filter(s => !(s.time === time && s.type === type));
+                    } else {
+                        el.classList.remove('full');
+                    }
+                }
+            });
+            updateTotalDisplay();
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            applySessionStates();
+            updateTotalDisplay();
+            showStep(1);
+            updateStepIndicator(1);
+            document.getElementById('adminBtn').addEventListener('click', openAdminLogin);
+            const s3Wa = document.getElementById('step3AdminWa');
+            if (s3Wa) {
+                s3Wa.textContent = WA_ADMIN_NUMBER.startsWith('62') ? ('+62 ' + WA_ADMIN_NUMBER.slice(2)) : WA_ADMIN_NUMBER;
+            }
+            document.getElementById('adminPasswordInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') adminLogin();
+            });
+        });
+    </script>
+</body>
+</html>
