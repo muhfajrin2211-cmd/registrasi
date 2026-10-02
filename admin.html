@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Papih Gaming Scrim</title>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #080812;
+            --bg-secondary: #0f1026;
+            --bg-card: #151633;
+            --bg-card-hover: #1c1e42;
+            --accent: #ff334b;
+            --accent-glow: #ff5268;
+            --accent-blue: #3b82f6;
+            --gold: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.35);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #23254d;
+            --border-highlight: #3b3f75;
+            --success: #10b981;
+            --error: #ef4444;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7);
+            --glow: 0 0 25px rgba(255, 51, 75, 0.3);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 10% 15%, rgba(255, 51, 75, 0.12) 0%, transparent 45%),
+                radial-gradient(ellipse at 90% 85%, rgba(59, 130, 246, 0.1) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(251, 191, 36, 0.04) 0%, transparent 60%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* LOGO */
+        .panel-logo {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 51, 75, 0.8);
+            box-shadow: 0 0 25px rgba(255, 51, 75, 0.5), 0 0 50px rgba(251, 191, 36, 0.2);
+            margin: 0 auto 14px;
+            display: block;
+        }
+
+        /* LOGIN CARD */
+        .login-card {
+            max-width: 440px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 36px 30px;
+            box-shadow: var(--shadow), var(--glow);
+            text-align: center;
+            backdrop-filter: blur(12px);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .login-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 60%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+
+        .admin-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(255, 51, 75, 0.3);
+            background: rgba(255, 51, 75, 0.04);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #d91c33 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 20px rgba(255, 51, 75, 0.35);
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 51, 75, 0.55);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+            display: none;
+            text-align: left;
+        }
+
+        .alert-box.show { display: block; animation: shake 0.3s ease; }
+
+        /* DASHBOARD SECTION */
+        .dashboard-wrapper {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .dash-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 22px;
+        }
+
+        .dash-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dash-title-group .dash-mini-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+        }
+
+        .dash-title-group h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            display: inline-block;
+        }
+
+        .dash-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-action-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action-ghost:hover {
+            border-color: var(--accent);
+            color: #fff;
+            background: rgba(255, 51, 75, 0.1);
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: var(--error);
+            color: #fff;
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .stat-card .val {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .stat-card.active-stat .val { color: var(--success); }
+        .stat-card.full-stat .val { color: var(--error); }
+        .stat-card.hidden-stat .val { color: var(--gold); }
+
+        /* TOOLBAR */
+        .control-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .guide-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-bulk-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small-tool {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .btn-small-tool:hover {
+            color: #fff;
+            border-color: var(--text-muted);
+        }
+
+        /* SESSION GRID */
+        .sessions-list-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .session-ctrl-card {
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: all var(--transition);
+        }
+
+        .session-ctrl-card:hover {
+            border-color: var(--border-highlight);
+        }
+
+        .session-ctrl-card.state-hidden {
+            opacity: 0.6;
+            background: rgba(251, 191, 36, 0.03);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .session-ctrl-card.state-full {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-time-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .session-time-num {
+            font-family: 'Rajdhani', monospace;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-pill {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .tag-pill.daily { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .tag-pill.night { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+        .session-sub-price {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .toggles-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-item.hide-opt { color: var(--gold); }
+        .toggle-item.full-opt { color: var(--error); }
+
+        .toggle-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .toggle-item.full-opt input[type="checkbox"] {
+            accent-color: var(--error);
+        }
+
+        /* BOTTOM SAVE BAR */
+        .save-bar {
+            position: sticky;
+            bottom: 16px;
+            background: rgba(15, 16, 38, 0.95);
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 14px 22px;
+            box-shadow: 0 10px 40px rgba(255, 51, 75, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .save-status-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save-database {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-save-database:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .btn-save-database:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* TOAST ALERT */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 22px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 700;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toast.success {
+            background: #064e3b;
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        .toast.error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sessions-list-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .dash-topbar { flex-direction: column; align-items: flex-start; }
+            .dash-actions { width: 100%; justify-content: space-between; }
+            .save-bar { flex-direction: column; gap: 12px; align-items: stretch; text-align: center; }
+            .btn-save-database { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="container">
+        <!-- 1. LOGIN SECTION (Muncul saat belum login) -->
+        <div class="login-card" id="loginSection">
+            <img src="logo.jpg" alt="Papih Gaming" class="panel-logo" />
+            <h1 class="login-title">PAPIH GAMING</h1>
+            <p class="login-subtitle">Admin Panel Scrim Management</p>
+
+            <div class="alert-box" id="loginAlert"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Email Admin</label>
+                    <input type="email" id="loginEmail" class="admin-input" placeholder="Masukkan email admin..." required autocomplete="username" />
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" class="admin-input" placeholder="Masukkan password..." required autocomplete="current-password" />
+                </div>
+                <button type="submit" class="btn-submit" id="btnLogin">Masuk ke Panel</button>
+            </form>
+
+            <div style="margin-top:20px;">
+                <a href="index.html" class="btn-action-ghost" style="display:inline-flex;font-size:0.8rem;">← Kembali ke Halaman Registrasi</a>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD SECTION (Hanya muncul jika sudah login Firebase Auth) -->
+        <div class="dashboard-wrapper" id="dashboardSection">
+            <div class="dash-topbar">
+                <div class="dash-title-group">
+                    <img src="logo.jpg" alt="Logo" class="dash-mini-logo" />
+                    <div>
+                        <h1>KELOLA SESI SCRIM</h1>
+                        <div class="user-status">
+                            <span class="online-dot"></span>
+                            <span id="userEmailDisplay">admin</span> • <span style="color:var(--success);font-weight:700;">Admin Terverifikasi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-actions">
+                    <a href="index.html" target="_blank" class="btn-action-ghost" title="Buka website yang dilihat peserta">
+                        👁️ Lihat Web Peserta
+                    </a>
+                    <button class="btn-logout" onclick="handleLogout()">🚪 Keluar</button>
+                </div>
+            </div>
+
+            <!-- STATS BAR -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="val" id="statTotal">15</div>
+                    <div class="lbl">Total Sesi</div>
+                </div>
+                <div class="stat-card active-stat">
+                    <div class="val" id="statActive">0</div>
+                    <div class="lbl">Sesi Buka</div>
+                </div>
+                <div class="stat-card full-stat">
+                    <div class="val" id="statFull">0</div>
+                    <div class="lbl">Sesi Penuh (Full)</div>
+                </div>
+                <div class="stat-card hidden-stat">
+                    <div class="val" id="statHidden">0</div>
+                    <div class="lbl">Disembunyikan</div>
+                </div>
+            </div>
+
+            <!-- CONTROLS TOOLBAR -->
+            <div class="control-toolbar">
+                <div class="guide-text">
+                    💡 Centang <strong>Sembunyikan</strong> agar sesi hilang dari web. Centang <strong>Full</strong> agar sesi terkunci (tampil tanda FULL).
+                </div>
+                <div class="quick-bulk-btns">
+                    <button class="btn-small-tool" onclick="resetAllStates()">🔄 Buka Semua</button>
+                    <button class="btn-small-tool" onclick="markAllFull()">🔴 Full-kan Semua</button>
+                </div>
+            </div>
+
+            <!-- LIST DAFTAR SESI -->
+            <div class="sessions-list-grid" id="sessionListGrid">
+                <!-- Diisi otomatis oleh JavaScript -->
+            </div>
+
+            <!-- BOTTOM SAVE BAR -->
+            <div class="save-bar">
+                <div class="save-status-text">
+                    <span id="syncIndicator">🟢 Terkoneksi Realtime ke Firebase</span>
+                </div>
+                <button class="btn-save-database" id="btnSaveDb" onclick="saveToDatabase()">
+                    💾 Simpan Perubahan ke Database
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIREBASE CONFIG ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp57WGOhmhcCTfQA_kOb3Nh_XZS-9sIww",
+            authDomain: "registrasi-5d8e1.firebaseapp.com",
+            databaseURL: "https://registrasi-5d8e1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "registrasi-5d8e1",
+            storageBucket: "registrasi-5d8e1.firebasestorage.app",
+            messagingSenderId: "3774493819",
+            appId: "1:3774493819:web:56ded4fef4637095f71ede",
+            measurementId: "G-LDB9SDJWB8"
+        };
+
+        // Inisialisasi Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const rtdb = firebase.database();
+
+        // Data master sesi sesuai dengan di formulir pendaftaran
+        const MASTER_SESSIONS = [
+            { time: "10.00", type: "daily", price: "5.000" },
+            { time: "11.00", type: "daily", price: "5.000" },
+            { time: "12.00", type: "daily", price: "5.000" },
+            { time: "13.00", type: "daily", price: "5.000" },
+            { time: "14.00", type: "daily", price: "5.000" },
+            { time: "15.00", type: "daily", price: "5.000" },
+            { time: "16.00", type: "daily", price: "5.000" },
+            { time: "17.00", type: "daily", price: "5.000" },
+            { time: "19.00", type: "daily", price: "5.000" },
+            { time: "19.00", type: "night", price: "10.000" },
+            { time: "20.00", type: "daily", price: "5.000" },
+            { time: "20.00", type: "night", price: "10.000" },
+            { time: "21.00", type: "daily", price: "5.000" },
+            { time: "21.00", type: "night", price: "10.000" },
+            { time: "22.00", type: "daily", price: "5.000" },
+            { time: "22.00", type: "night", price: "10.000" },
+            { time: "23.00", type: "daily", price: "5.000" },
+            { time: "00.00", type: "daily", price: "5.000" },
+            { time: "01.00", type: "daily", price: "5.000" }
+        ];
+
+        let currentHidden = [];
+        let currentFull = [];
+
+        // ==================== AUTH STATE LISTENER ====================
+        auth.onAuthStateChanged((user) => {
+            const loginSection = document.getElementById('loginSection');
+            const dashboardSection = document.getElementById('dashboardSection');
+
+            if (user) {
+                // Admin Berhasil Login
+                loginSection.style.display = 'none';
+                dashboardSection.style.display = 'block';
+                document.getElementById('userEmailDisplay').textContent = user.email || 'Admin';
+                loadDataFromDatabase();
+            } else {
+                // Belum Login
+                loginSection.style.display = 'block';
+                dashboardSection.style.display = 'none';
+            }
+        });
+
+        // ==================== LOGIN HANDLER ====================
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('btnLogin');
+            const alertEl = document.getElementById('loginAlert');
+
+            btn.disabled = true;
+            btn.textContent = 'Memverifikasi...';
+            alertEl.classList.remove('show');
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => {
+                    showToast('Login berhasil! Selamat datang Admin.', 'success');
+                })
+                .catch((error) => {
+                    alertEl.textContent = 'Gagal Masuk: ' + getFriendlyAuthError(error.code);
+                    alertEl.classList.add('show');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = 'Masuk ke Panel';
+                });
+        }
+
+        // ==================== LOGOUT HANDLER ====================
+        function handleLogout() {
+            if (confirm('Yakin ingin keluar dari Admin Panel?')) {
+                auth.signOut().then(() => {
+                    showToast('Anda telah logout.', 'success');
+                });
+            }
+        }
+
+        function getFriendlyAuthError(code) {
+            switch(code) {
+                case 'auth/invalid-email': return 'Format email tidak valid.';
+                case 'auth/user-not-found': return 'Akun admin dengan email tersebut tidak ditemukan.';
+                case 'auth/wrong-password': return 'Password yang Anda masukkan salah!';
+                case 'auth/invalid-credential': return 'Email atau password salah. Silakan coba lagi.';
+                case 'auth/too-many-requests': return 'Terlalu banyak percobaan gagal. Silakan tunggu beberapa saat.';
+                default: return 'Terjadi kesalahan (' + code + ').';
+            }
+        }
+
+        // ==================== LOAD & RENDER SESSIONS ====================
+        function loadDataFromDatabase() {
+            rtdb.ref('scrim_sessions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    currentHidden = data.hidden || [];
+                    currentFull = data.full || [];
+                }
+                renderSessionGrid();
+                updateStats();
+            }, (err) => {
+                console.warn('Realtime sync warning:', err);
+            });
+        }
+
+        function renderSessionGrid() {
+            const container = document.getElementById('sessionListGrid');
+            container.innerHTML = '';
+
+            MASTER_SESSIONS.forEach((s) => {
+                const isHidden = currentHidden.some(h => h.time === s.time && h.type === s.type);
+                const isFull = currentFull.some(f => f.time === s.time && f.type === s.type);
+
+                let cardClasses = 'session-ctrl-card';
+                if (isHidden) cardClasses += ' state-hidden';
+                else if (isFull) cardClasses += ' state-full';
+
+                const typeLabel = s.type === 'daily' ? 'DAILY' : 'NIGHT';
+
+                const card = document.createElement('div');
+                card.className = cardClasses;
+                card.innerHTML = `
+                    <div class="session-info">
+                        <div class="session-time-header">
+                            <span class="session-time-num">${s.time}</span>
+                            <span class="tag-pill ${s.type}">${typeLabel}</span>
+                        </div>
+                        <div class="session-sub-price">Rp ${s.price} / slot</div>
+                    </div>
+                    <div class="toggles-group">
+                        <label class="toggle-item hide-opt" title="Centang untuk menyembunyikan dari formulir">
+                            <input type="checkbox" class="chk-hide" data-time="${s.time}" data-type="${s.type}" ${isHidden ? 'checked' : ''} onchange="onToggleChange()">
+                            Sembunyikan
+                        </label>
+                        <label class="toggle-item full-opt" title="Centang untuk menandai slot penuh">
+                            <input type="checkbox" class="chk-full" data-time="${s.time}" data-type="${s.type}" ${isFull ? 'checked' : ''} onchange="onToggleChange()">
+                            Full
+                        </label>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function onToggleChange() {
+            collectCurrentCheckboxes();
+            renderSessionGrid();
+            updateStats();
+        }
+
+        function collectCurrentCheckboxes() {
+            const hidden = [];
+            const full = [];
+
+            document.querySelectorAll('#sessionListGrid .chk-hide').forEach(cb => {
+                if (cb.checked) hidden.push({ time: cb.dataset.time, type: cb.dataset.type });
+            });
+            document.querySelectorAll('#sessionListGrid .chk-full').forEach(cb => {
+                if (cb.checked) full.push({ time: cb.dataset.time, type: cb.dataset.type });
+            });
+
+            currentHidden = hidden;
+            currentFull = full;
+        }
+
+        function updateStats() {
+            const total = MASTER_SESSIONS.length;
+            const hiddenCount = currentHidden.length;
+            const fullCount = currentFull.length;
+            const activeCount = Math.max(0, total - hiddenCount - fullCount);
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActive').textContent = activeCount;
+            document.getElementById('statFull').textContent = fullCount;
+            document.getElementById('statHidden').textContent = hiddenCount;
+        }
+
+        // ==================== BULK BUTTONS ====================
+        function resetAllStates() {
+            if (confirm('Buka semua sesi? (Semua tanda Full dan Sembunyikan akan dicopot)')) {
+                currentHidden = [];
+                currentFull = [];
+                renderSessionGrid();
+                updateStats();
+            }
+        }
+
+        function markAllFull() {
+            if (confirm('Tandai semua sesi sebagai FULL?')) {
+                currentFull = MASTER_SESSIONS.map(s => ({ time: s.time, type: s.type }));
+                renderSessionGrid();
+                updateStats();
+            }
+        }
+
+        // ==================== SAVE TO DATABASE ====================
+        function saveToDatabase() {
+            collectCurrentCheckboxes();
+            const btn = document.getElementById('btnSaveDb');
+            const origText = btn.textContent;
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Menyimpan ke Database...';
+
+            rtdb.ref('scrim_sessions').set({
+                hidden: currentHidden,
+                full: currentFull,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                showToast('✅ Berhasil disimpan! Semua pengunjung langsung tersinkron.', 'success');
+            }).catch((err) => {
+                console.error('Firebase save error:', err);
+                showToast('❌ Gagal menyimpan: ' + err.message, 'error');
+            }).finally(() => {
+                btn.disabled = false;
+                btn.textContent = origText;
+            });
+        }
+
+        // ==================== TOAST HELPER ====================
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
