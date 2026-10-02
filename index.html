@@ -743,7 +743,7 @@
     <script>
         // ==================== KONFIGURASI ====================
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtrKFN27b3KHR_hWnVrN7JiFxLSWGG5g-FGxp3GXUFajLFVvPwijkeEQ3YRImniN3Lsw/exec';
-        const ADMIN_PASSWORD = 'parangcarammeng2000';
+        const ADMIN_PASSWORD = 'jaja2000';
         const WA_ADMIN_NUMBER = '6285166235006';
 
         // ==================== FIREBASE REALTIME DATABASE ====================
@@ -1165,6 +1165,7 @@
                 rtdb.ref('scrim_sessions').set({
                     hidden: hidden,
                     full: full,
+                    admin_key: 'jaja2000',
                     updatedAt: new Date().toISOString()
                 }).then(() => {
                     alert('✅ Perubahan berhasil disimpan! Semua HP & pengunjung langsung tersinkron secara realtime.');
